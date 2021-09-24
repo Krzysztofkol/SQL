@@ -1,0 +1,65 @@
+#####1. Ile panstw znajduje sie na kazdym z kontynentow?
+###Grupowanie dobrze jest rozpocząć od wyobrażenia sobie przykładowych wyników kwerendy, 
+###jaką mamy przygotować. Potem zasanowmy sie, jakich funkcji aggregujących użyc oraz cel zgrupowania
+#continent | ilePanstw
+#North Am  | 50
+#FUNKCJA AGGREGUJACA: COUNT()
+#GROUP BY Continent
+###Cel: stworzenie nowej wirtualnej kolumny
+###Wciśnij ctrl i nazwę tabeli, by otworzyła sie w nowym oknie
+#SELECT Continent, COUNT(Code) AS ilePanstw FROM country GROUP BY Continent ORDER BY ilePanstw DESC
+###Kolejnosc: FROM... WHERE... GROUP BY... ORDER BY...
+
+#####2. Które jezyki (oficjalne,urzedowe) sa uzywane przez najwiecej panstw europejskich
+#jezyk|liczba panstw/freq
+#agg: COUNT()
+#WHERE
+#IsOfficial='T'
+#Continent='Europe'
+#GROUP BY Language
+SELECT Language, COUNT(CountryCode) AS freq FROM countrylanguage, country WHERE countrylanguage.CountryCode=country.Code AND IsOfficial='T' AND Continent='Europe' GROUP BY Language ORDER BY freq DESC
+
+#####3. Podaj dla każdego państwa w Ameryce Południowej łączną liczbę obywateli, mieszkających w
+#dużych miastach, o populacji wynoszącej co najmniej 100k mieszkańców
+#Państwa AmPoł|łączna liczba obywateli mieszkajacych w duzych miastach >100k
+#Funkcja aggregująca:
+#WHERE
+#Continent='South America'
+#Population>=100000
+#RELACJE: city.CountryCode= country.Code; country.Name=/=city.Name; zapytanie złożone
+#FUNKCJA AGREGUJĄCA: SUM(Population)
+#SELECT country.Name, SUM(city.Population) AS LiczbaObywateliDuzychMiast FROM city, country WHERE city.CountryCode=country.Code AND Continent = 'South America' AND city.Population>=100000 GROUP BY country.Name ORDER BY LiczbaObywateliDuzychMiast DESC
+
+#####4. Ile ptakopw nalezacych do kazdego gatunku zaobserwowano? Ktorego gatunku najwiecej?
+#Nazwa_zwyczajowa|Liczba zaobserwowan ptaka
+#Funkcja aggregująca:
+#FROM obserwacje, gatunki
+#WHERE 
+#nazwa_zwyczajowa
+#liczebnosc
+#RELACJE: obserwacje.ID_gatunku=gatunki.ID_gatunku
+#GROUP BY: nazwa_zwyczajowa
+SELECT nazwa_zwyczajowa, SUM(liczebnosc) AS Liczba FROM gatunki, obserwacje WHERE obserwacje.ID_gatunku=gatunki.ID_gatunku  GROUP BY nazwa_zwyczajowa ORDER BY Liczba DESC  
+
+#####5. Jakich 10 gatunków ptaków było obiektem najczęściej prowadzonych obserwacji przez ornitologów w powiecie gdańskim?
+#Gatunek|(opcjonalnie liczba zaobserwowanych)
+#Funkcja aggregująca: SUM(liczebnosc)
+#FROM obserwacje, gatunki, lokalizacje
+#WHERE 
+powiat='gdanski'
+#Relacje: lokalizacje.ID_lokalizacji=obserwacje.ID_lokalizacji AND gatunki.ID_gatunku=obserwacje.ID_gatunku
+#SELECT nazwa_zwyczajowa AS Gatunek, COUNT(liczebnosc) AS Liczba FROM obserwacje, gatunki, lokalizacje WHERE lokalizacje.ID_lokalizacji=obserwacje.ID_lokalizacji AND gatunki.ID_gatunku=obserwacje.ID_gatunku AND powiat='gdanski' GROUP BY Gatunek ORDER BY Liczba DESC LIMIT 10
+
+#####6. W którym powiecie liczba zaobserwowanych ptaków z gatunku dzięcioł (lecz tylko takich, które żerują w lesie)
+##jest największa, a w którym najmniejsza
+[Powiat|(liczba)]
+agg: SUM(liczebnosc)
+FROM gatunki, lokalizacje, obserwacje
+WHERE
+zachowanie=zeruje
+nazwa_zwyczajowa LIKE "dzieciol%"
+opis LIKE "%las%"
+Relacje: gatunki.ID_gatunku=obserwacje.ID_gatunku AND lokalizacje.ID_lokalizacji=obserwacje.ID_lokalizacji
+SELECT powiat, SUM(liczebnosc) AS liczbaZerujacychLas FROM gatunki, lokalizacje, obserwacje WHERE gatunki.ID_gatunku=obserwacje.ID_gatunku AND lokalizacje.ID_lokalizacji=obserwacje.ID_lokalizacji AND nazwa_zwyczajowa LIKE "dzieciol%" AND opis LIKE "%las%" AND zachowanie='zeruje' GROUP BY powiat ORDER BY liczbaZerujacychLas DESC LIMIT 1
+###
+!!!Przyjrzyj się danym przed tworzeniem zapytania
