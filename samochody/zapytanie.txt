@@ -1,0 +1,22 @@
+#SELECT * from klienci
+#1. Imię i nazwisko (tylko te dwie dane) klienta numer 4.
+#SELECT imie, nazwisko FROM klienci
+#2. Wszystkie dane samochodów z rocznika 2010.
+#SELECT * FROM auta WHERE rocznik=2010
+#3. Wszystkie dane na temat samochodów marki Ford posiadanych przez nas (innymi słowy: "jakie mamy auta marki Ford w firmie i co o nich wiemy?").
+#SELECT * FROM auta WHERE marka='Ford'
+#4. Samochody o numerach w bazie od 2 do 4 włącznie.
+#SELECT * FROM auta WHERE idauta BETWEEN 2 AND 4
+#5. Imiona i nazwiska klientów, którzy mieszkają w Katowicach na ulicy Rolnej (pod dowolnym numerem).
+#SELECT klienci.imie, klienci.nazwisko FROM klienci WHERE miasto='Katowice' AND adres LIKE 'Rolna%'
+#6. Samochód w bazie (marka, model), którego ubezpieczenie jest najdroższe z wszystkich aut.
+#SELECT marka,model FROM auta GROUP BY ubezpieczenie DESC LIMIT 1
+#7. Samochód (idauta, marka, model), który został najwcześniej wypożyczony (decyduje datawyp).
+#SELECT a.idauta, a.marka, a.model FROM auta AS a, wypozyczenia AS w WHERE a.idauta=w.idauta ORDER BY idwyp ASC Limit 1
+#8. Imiona i nazwiska osób, które wypożyczyły kiedykolwiek samochód nr 1.
+#SELECT k.imie, k.nazwisko FROM klienci AS k, wypozyczenia AS w WHERE k.idklienta=w.idklienta AND w.idauta=1
+#9. Jakie auta (marka, model) kiedykolwiek wypożyczyła u nas osoba nr 4?
+#SELECT a.marka, a.model FROM auta AS a, klienci as k, wypozyczenia AS w WHERE k.idklienta=w.idklienta AND w.idauta = a.idauta AND k.idklienta=4 
+#SELECT a.marka, a.model FROM auta AS a, wypozyczenia AS w WHERE w.idauta = a.idauta AND w.idklienta=4 
+#10. Jakie auta (marka, model) kiedykolwiek wypożyczyła u nas osoba o nazwisku "Pastewniak"?
+#SELECT a.marka, a.model FROM auta as a, klienci as k, wypozyczenia as w WHERE k.idklienta=w.idklienta AND w.idauta=a.idauta AND k.nazwisko='Pastewniak'

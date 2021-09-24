@@ -1,0 +1,27 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+#SELECT tresc, odpa, odpb, odpc, odpd FROM pytania
+#1
+#SELECT * FROM pytania WHERE id=15
+#SELECT * FROM pytania WHERE answer='a'
+#SELECT * FROM pytania WHERE rok=2007
+#SELECT * FROM pytania WHERE rok=2009 and kategoria='programowanie'
+#SELECT tresc, odpa, odpb, odpc, odpd FROM pytania WHERE rok='2010'
+#SELECT tresc, odpa, odpb, odpc, odpd FROM pytania ORDER BY tresc ASC
+#SELECT tresc FROM pytania WHERE id BETWEEN 10 AND 12
+#id=10 or id=11 or id=12
+#SELECT * FROM pytania WHERE tresc LIKE 'Jak%'
+#SELECT * FROM pytania WHERE tresc LIKE '%C++%' or odpa LIKE '%C++%' or odpb LIKE '%C++%' or odpc LIKE '%C++%' or odpd LIKE '%C++%'
+#SELECT tresc, odpa, odpb, odpc, odpd FROM pytania WHERE kategoria='programowanie' and rok=2012 or kategoria='systemy operacyjne i sieci' and rok=2012
+#SELECT  tresc, odpa, odpb, odpc, odpd, kategoria, rok FROM pytania WHERE (kategoria='programowanie' or kategoria='systemy operacyjne i sieci') and rok=2012

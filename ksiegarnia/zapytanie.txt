@@ -1,0 +1,131 @@
+###3 cia lekcja ksiegarnia
+#Agnieszka Jankowska -> Agnieszka Psiukuta
+#UPDATE klienci SET nazwisko='Psiukta' WHERE idklienta=4 ###UWAGA!!! Poprzez zapomnienie o WHERE może dojść do masakry
+###Zrób backup na początku na wypadek popełnienia błedu
+###Uważaj na polecenie UPDATE
+#SELECT * FROM klienci
+###Zmieńmy idklienta osoby nr 3 na wartość 1
+#UPDATE klienci SET idklienta=1 WHERE idklienta=3
+## #1062 - Duplicate entry '1' for key 'PRIMARY'
+###Zwiększ cenę wszystkich książek w bazie o 10%
+##UPDATE ksiazki SET cena=1.1*cena
+###Musza byc tylko 2 msca po przecinku. trzeba zaokroglic funkcja ROUND
+#UPDATE ksiazki SET cena=ROUND(cena*1.1,2)
+###Zmniejsz cene najdrozszej ksiazki o 10zł
+#UPDATE ksiazki SET cena=cena-10 WHERE idksiazki=3
+#UPDATE ksiazki SET cena=cena-10 ORDER BY cena DESC LIMIT 1
+###Zmien imie i nazwisko Anny Kareniny (idklienta=10) na wartosc: Joanna Dostojewska
+#UPDATE klienci SET imie='Joanna', nazwisko='Dostojewska' WHERE idklienta=10
+###Zmien status zamowien nr 4 i 5 na wyslano
+#UPDATE zamowienia SET status='wyslano' WHERE idzamowienia BETWEEN 4 AND 5 
+#idzamowienia=4 OR idzamowienia=5
+#idzamowienia>=4 AND idzamowienia<=5
+###INSERT
+###Dodaj do bazy Franicszka Janowskiego z Chorzowa
+#INSERT INTO klienci VALUES (NULL,'Franciszek', 'Janowski','Chorzów')
+###Dodaj nowe zamowienie: Artur Rutkowski(7) kupił "HTML5. Tworzenie witryn"(3)
+###Zróbmy to w zmienionej kolejnosci
+#INSERT INTO zamowienia (idzamowienia,data,status,idklienta,idksiazki) VALUES (NULL,"2020-01-01",'oczekiwanie',7,3)
+###Wstaw do bazy ,,Symfonia C++" autora o nazwisku "Grębosz"
+#INSERT INTO ksiazki (idksiazki,nazwiskoautora,tytul) VALUES (NULL,'Grębosz','Symfonia C++')
+###Dodaj 2 klientow 1 zapytaniem
+#INSERT INTO klienci VALUES (NULL,'Marilyn','Monroe','Los Angeles'), (NULL,'John','Wayne','Los angeles')
+###ALTERNATYWNA metoda
+#INSERT INTO klienci SET idklienta=NULL, imie='Steve', nazwisko='McQueen',miejscowosc='Los Angeles'
+
+
+###5 lekcja usuwanie danych DELETE, TRUNCATE, DROP
+###Różne czynności kryją się pod usuwaniem danych: np zmiana
+#UPDATE klienci SET nazwisko='' WHERE idklienta=3
+###Usuwanie zawartości pola w tabeli ~ UPDATE
+###Usuwanie jednego/wielu rekordów ~ DELETE
+###Usuwanie wszystkich rekordów tabeli ~ TRUNCATE
+###Usuwanie STUKTURY tabeli.całej bazy ~ DROP
+
+###Skasuj rekord nr 2 w zamowieniu: anulowanie zakupu
+#DELETE FROM zamowienia WHERE idzamowienia=2
+###Usunięcie rekordu powoduje wystapienie dziury w tabeli
+###DELETE FROM nazwa_tabeli WHERE określony_warunek
+###ANTYFUCKUP
+#1) Pominięcie WHERE może popsuć wszystkie rekordy z tabeli
+#2) Przed wykonaniem jakichkolwiek nietestowanych zapytań UPDATE,DELETE,TRUNCATE,DROP 
+#najlepiej wykonać backup (tutaj export) bazy danych, by w razie czego odtworzyć zniszczone dane
+###TRUNCATE szybsze od DELETE [] WHERE []
+###TRUNCATE TABLE nazwa_tabeli; delete usuwa rekord po rekordzie, dlatego wolniejszy
+###TRUNCATE robi drop całej bazy i tworzy nową o tej samej strukturze i nazwie zapytaniem CREATE
+###TRUNCATE TABLE nazwa_tabeli ~ syntax
+###C:\xampp\mysql\bin> mysql.exe -u -root
+###MariaDB [{none}]> use ksiegarnia
+###MariaDB [{ksiegarnia}] source slowa_kluczowe.sql (po wpakowaniu do jednakowego folderu)
+###Klauzule stosowane po DELETE: ORDER BY (kolejność usuwania rekordów rekord po rekordzie)
+							  ###LIMIT ograniczenie liczby usuwanych rekordów, przydatne do podzielenia na segmenty/podzapytania
+###W tabeli klienci usuńmy 5 ostatnich osób
+#DELETE FROM klienci ORDER BY idklienta DESC LIMIT 5	
+###Zachowaj szczególną ostrożnośc przy usuwaniu/zmienianiu	
+#bit.ly/manual-delete
+#bit.ly/manual-truncate	 
+###DROP TABLE, DROP DATABASE, DROP EVENT, DROP FUNCTION, DROP INDEX, 
+###DROP SERVER, DROP TABLESPACE, DROP VIEW
+#Pozbadzmy sie calej bazy danych slowa_kluczowe
+#DROP DATABASE slowa_kluczowe
+#DROP TABLE klienci ~ znika cała tabela
+###Dodatkowa klauzula do dropa: IF EXISTS: DROP TABLE IF EXISTS klienci
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### 2ga lekcja
+
+#SELECT * FROM ksiazki
+####Zadania związane z łączeniem tabel i złączonymi poleceniami select
+##7. Wyjmij dla wszystkich zamówień: imię i nazwisko klienta zamawiającego, id zamówienia, datę zamówienia.
+##Dane klienta w klienci. dane zamówienia w zamówieniach
+##Schemat nazewnictwa: tabela.kolumna 
+#SELECT klienci.imie, klienci.nazwisko, zamowienia.idzamowienia, zamowienia.data FROM klienci, zamowienia 
+#chaos, bo w relacyjnej bazie danych pomiędzy poszczególnymi kolumnami zachodzą relacje
+#zadając pytanie bierzemy pod wuagę wszystkie relacje i wypisać ich listę po WHERE
+#więcej tebel ~ więcej relacji
+###8. Imiona i nazwiska osób, które zamówiły kiedykolwiek książkę nr 2
+#SELECT klienci.imie, klienci.nazwisko, zamowienia.idzamowienia, zamowienia.data FROM klienci, zamowienia WHERE klienci.idklienta = zamowienia.idklienta
+#UWAGA ~ nazwy kolumn nie muszą być takie same. idklienta moze być gdzieś indziej idk.
+#jeżeli w obu tabelach są imiona, to musimy je podlinkować
+#aliasy ~końcowa optymalizacja
+#SELECT k.imie, k.nazwisko, z.idzamowienia, z.data FROM klienci AS k, zamowienia AS z WHERE k.idklienta = z.idklienta
+#mistkake~SELECT k.imie, k.nazwisko, z.idksiazki FROM klienci AS k, zamowiena AS z, ksiazki AS ks WHERE k.idklienta=z.idklienta and z.idksiazki=ks.idksiazki and z.idksiazki=2
+#SELECT k.imie, k.nazwisko FROM klienci AS k, zamowienia AS z WHERE k.idklienta=z.idklienta AND z.idksiazki=2
+###9. Jakie książki (tytuł, autor) zamówiła osoba: Jan Nowak?
+#SELECT ks.tytul, ks.imieautora, ks.nazwiskoautora FROM ksiazki AS ks, zamowienia AS z, klienci as k WHERE ks.idksiazki=z.idksiazki AND k.idklienta=z.idklienta AND k.imie='Jan' AND k.nazwisko='Nowak'
+#od imienia i nazwiska lepsze id
+#SELECT ks.tytul, ks.imieautora, ks.nazwiskoautora FROM ksiazki AS ks, zamowienia AS z, klienci as k WHERE ks.idksiazki=z.idksiazki AND k.idklienta=z.idklienta AND k.idklienta=2
+###10. Zamówienia dokonane przez osoby o nazwisku Rutkowski ułożone wg daty od
+#najpóźniej dokonanych (imię i nazwisko osoby zamawiającej, id, datę i status
+#zamówienia, tytuł zamówionej książki)
+#SELECT z.idzamowienia,z.data,z.status,ks.tytul,k.imie,k.nazwisko FROM ksiazki AS ks, klienci AS k, zamowienia AS z WHERE ks.idksiazki=z.idksiazki AND z.idklienta=k.idklienta AND k.nazwisko='Rutkowski' GROUP BY z.data DESC
+#ORDER BY VS GROUP BY
+#ORDER BY and GROUP BY. ORDER BY sorts data based on data of a column. Of course, as a result of sorting, data from the same values will be brought together as a group, which will make it easy for you to manually analyze later. But GROUP BY is the SQL way to analyze similar data.
+
+
+
+###Powtórka przed lekcja
+#SELECT * FROM ksiazki
+#SELECT * FROM ksiazki GROUP BY tytul ASC
+#SELECT * FROM ksiazki GROUP BY cena DESC limit 1
+#SELECT * FROM zamowienia WHERE status='wyslano'
+#SELECT * FROM klienci WHERE nazwisko='Rutkowski'
+#SELECT * FROM ksiazki WHERE tytul LIKE '%PHP%'
+#SELECT * FROM zamowienia GROUP BY data DESC
+
+
+
+
